@@ -1,0 +1,268 @@
+<html>
+    <head>
+        <meta http-equiv = "content-type" content = text/html; charset = windows-1252">
+        <title>MINA 1 - Instruction Summary and Formats</title>
+        <meta name = "Author"   content = "Michelle-Marie Schiller">
+        <meta name = "Keywords" content = "mina,summary,instructions,formats">
+    </head>
+
+    <body bgcolor ="#D3F5FD"></body>
+
+    <center>
+        <a name = "contents"></a>
+        <a name = "mina"></a><font size = "+3">MINA 1 - Instruction Summary and Formats</font><br>
+    </center>
+
+    <table width = "100%"><tbody><tr><td width = "100%" valign = "TOP>
+        <table width = "100%"><tbody><tr bgcolor = "#CCCCCC"><td><font size = "+2">&nbsp;Contents</font></td></tr></tbody></td>
+    </tr></tbody></table><br>
+
+    <b>Instruction Formats</b><br>
+    <a href = "#instructions_format">Instruction Formats</a><br><br>
+
+    <b>Instruction Summary</b><br>
+    <a href = "#instructions_logical">Logical Instruction Group</a><br>
+    <a href = "#instructions_arithmetic">Arithmetic Instruction Group</a><br>
+    <a href = "#instructions_controlflow">Control Flow Instruction Group</a><br>
+    <a href = "#instructions_load">Load Instruction Group</a><br>
+    <a href = "#instructions_store">Store Instruction Group</a><br>
+    <a href = "#instructions_cpuctrl">CPU Control Instruction Group</a><br>
+    <a href = "#instructions_immediate">Immediate Instruction Group</a><br><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_format"></a>&nbsp;
+        MINA 1 Instruction Formats
+    </font></td></tr></tbody></table><br>
+
+    <b>MINA 1 Instruction Formats</b><br>
+
+    <table cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr><td><pre>
+_________________________________________________________________
+|..3 ..................2 ..................1 ..................0|
+|1_0_9_8_7_6_5_4_3_2_1_0_9_8_7_6_5_4_3_2_1_0_9_8_7_6_5_4_3_2_1_0|
+|_Condi_|_Group_|Opcode_|__SBZ__|Config_|_SRC1__|_SRC2__|_DEST__| default instruction format
+|_Condi_|0_0_0_1|1_0_0_1|_DES2__|Config_|_SRC1__|_SRC2__|_DEST__| long multiplication format
+|_Condi_|0_0_1_0|0_0_0_X|__SBZ__|Config_|_SRC1__|_SRC2__|__SBZ__| register branch/call format ((X == 0) => rbra, (X == 1) => rcall)
+|_Condi_|0_0_1_0|0_1_0_0|__________________SBZ__________________| return from subroutine format
+|_Condi_|0_1_1_0|Opcode_|__________________SBZ__________________| CPU control group format
+|_Condi_|0_1_1_1|Opcode_|_DES2__|_______16-bit_immediate________| immediate group format
+|_Condi_|1_0_0_X|___________signed_26-bit_offset_>>_2___________| branch/call format ((X == 0) => bra, (X == 1) => call)
+|_______________________________________________________________|
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_format"></a>&nbsp;
+        MINA 1 Instruction Summary
+    </font></td></tr></tbody></table><br>
+
+    <b>Condition codes</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Code  Suffix  Flags       Description
+   0h   N/A     N/A         Always
+   1h   _eq     Z=1         Equal
+   2h   _ne     Z=0         Not Equal
+   3h   _hs     C=1         unsigned Higher or Same
+   4h   _lo     C=0         unsigned LOwer
+   5h   _mi     N=1         signed negative (MInus)
+   6h   _pl     N=0         signed positive (PLus)
+   7h   _vs     V=1         signed overflow (oVerflow flag Set)
+   8h   _vc     V=0         signed no overflow (oVerflow flag Clear)
+   9h   _hi     C=1 & Z=0   unsigned Higher
+   Ah   _ls     C=0 | Z=1   unsigned Lower or Same
+   Bh   _ge     N=V         signed Greater than or Equal
+   Ch   _lt     N!V         signed Less than
+   Dh   _gt     Z=0 & N=V   signed Greater than
+   Eh   _le     Z=1 | N!V   signed Less than or Equal
+   Fh   _as     ZNVC=1      All flags Set
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_logical"></a>&nbsp;
+        Logical Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Logical Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0000" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - and    (Logical AND)
+           1h    - or     (Logical OR)
+           2h    - xor    (Exclusive OR)
+           3h    - nand   (NOT-AND)
+           4h    - not    (Complement)
+           5h    - nor    (NOT-OR)
+           6h    - xnor   (NOT-XOR)
+           7h    - cntlz  (Count Leading 0 Bits)
+           8h    - cntlo  (Count Leading 1 Bits)
+           9h    - popcnt (Count All 1 Bits)
+           Ah-Fh - invalid
+  19-16  Reserved field (should be zero)
+  15-12  Configuration field
+           0bXXXF - X = don't care (should be zero), F = set flags
+  11- 8  SRC1 register (r0-r15)
+   7- 4  SRC2 register (r0-r15) (unused by not, cntlz, cntlo, popcnt; should be zero)
+   3- 0  DEST register (r0-r15)
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_arithmetic"></a>&nbsp;
+        Arithmetic Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Arithmetic Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0001" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - add    (Add)
+           1h    - sub    (Subtract)
+           2h    - addc   (Add With Carry)
+           3h    - subc   (Subtract With Carry)
+           4h    - neg    (Negate)
+           5h    - comp   (Compare)
+           6h    - mult   (Multiply)
+           7h    - div    (Divide)
+           8h    - rem    (Divide, Save Remainder)
+           9h    - lmul   (Long Multiply)
+           Ah-Fh - invalid
+  19-16  Reserved field (should be zero) (used by lmul; DES2 field)
+  15-12  Configuration field
+           0bXSOF - X = don't care (should be zero), S = signed multiplication (only available for lmul)
+                    O = trap on overflow (not available for mult, div, rem, lmul), F = set flags (not available for comp)
+  11- 8  SRC1 register (r0-r15)
+   7- 4  SRC2 register (r0-r15) (unused by neg; should be zero)
+   3- 0  DEST register (r0-r15) (unused by comp; should be zero)
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_controlflow"></a>&nbsp;
+        Control Flow Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Control Flow Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0010" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - rbra  (Branch Register)
+           1h    - rcall (Call Register)
+           2h    - ret   (Return From Subroutine)   
+           3h-Fh - invalid
+  19-16  Reserved field (should be zero)
+  15-12  Configuration field
+           0bXXXO - X = don't care (should be zero), O = use SRC2 as offset (not available for ret)
+  11- 8  SRC1 register (r0-r15) (unused by ret; should be zero)
+   7- 4  SRC2 register (r0-r15) (unused by ret; should be zero) (if !O: unused; should be zero)
+   3- 0  Unused (should be zero)
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_load"></a>&nbsp;
+        Load Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Load Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0011" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - load   (Load Word)  
+           1h    - loadm  (Load Multiple)
+           2h    - loadb  (Load Byte) 
+           3h    - loadh  (Load Halfword) 
+           4h    - pop    (Pop Register) 
+           5h    - loadbe (Load Byte Sign-Extended)
+           6h    - popf   (Pop Flags Register)  
+           7h    - loadhe (Load Halfword Sign-Extended)
+           8h-Fh - invalid
+  19-16  Reserved field (should be zero) (used by loadm; DES2 field) (if I: used by load, loadb, loadh, loadbe, loadhe; DES2 field)
+  15-12  Configuration field
+           0b{H/I}UPW - H = access r8-r15 (only available for loadm)/I = use immediate offset (not available for loadm, pop, popf),
+                        U = add offset to base (not available for pop, popf),
+                        P = pre-increment base (not available for pop, popf), W = write back new base (not available for pop, popf)
+  11- 8  SRC1 register (r0-r15) (unused by pop, popf; should be zero)
+   7- 4  SRC2 register (r0-r15) (unused by pop, popf; should be zero) (used by loadm; upper four bits of register list)
+                                (if I: used by load, loadb, loadh, loadbe, loadhe; upper four bits of immediate)
+   3- 0  DEST register (r0-r15) (used by loadm; lower four bits of register list)
+                                (if I: used by load, loadb, loadh, loadbe, loadhe; lower four bits of immediate)
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_store"></a>&nbsp;
+        Store Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Store Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0100" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - stor   (Store Word)  
+           1h    - storm  (Store Multiple)
+           2h    - storb  (Store Byte) 
+           3h    - storh  (Store Halfword) 
+           4h    - push   (Push Register) 
+           5h    - pushpc (Push Program Counter)
+           6h    - pushf  (Push Flags Register)
+           7h-Fh - invalid
+  19-16  Reserved field (should be zero) (used by storm; DES2 field) (if I: used by stor, storb, storh; DES2 field)
+  15-12  Configuration field
+           0b{H/I}UPW - H = access r8-r15 (only available for storm)/I = use immediate offset (not available for storm, push, pushpc, pushf),
+                        U = add offset to base (not available for push, pushpc, pushf),
+                        P = pre-increment base (not available for push, pushpc, pushf), W = write back new base (not available for push, pushpc, pushf)
+  11- 8  SRC1 register (r0-r15) (unused by push, pushpc, pushf; should be zero)
+   7- 4  SRC2 register (r0-r15) (unused by push, pushpc, pushf; should be zero) (used by storm; upper four bits of register list)
+                                (if I: used by stor, storb, storh; upper four bits of immediate)
+   3- 0  DEST register (r0-r15) (used by storm; lower four bits of register list)
+                                (if I: used by stor, storb, storh; lower four bits of immediate)
+    </pre></td></tr></tbody></table><br>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_cpuctrl"></a>&nbsp;
+        CPU Control Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>CPU Control Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0110" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - stop    (Stop CPU)
+           1h    - wait    (Wait For Interrupt)
+           2h    - switchm (Switch To User Mode)
+           3h-Fh - invalid
+  19-0  Should be zero
+    </pre></td></tr></tbody></table><br>
+</html>
+
+    <table width = "100%" cellspacing = "0" cellpadding = "0" border = "0"><tbody><tr bgcolor = "CCCCCC"><td><font size = "+2">
+        <a name = "instructions_immediate"></a>&nbsp;
+        Immediate Instruction Group
+    </font></td></tr></tbody></table><br>
+
+    <b>Immediate Instructions</b><br>
+
+    <table cellspacing="0" cellpadding="0" border="0"><tbody><tr><td><pre>  Bit    Description
+  31-28  Condition code
+  27-24  Must be "0111" for this instruction group
+  24-20  Opcode (0h-Fh)
+           0h    - movimm   (Move Immediate)
+           1h    - movuimm  (Move Shifted Immediate)
+           2h    - andimm   (Logical AND Immediate)
+           3h    - orimm    (Logical OR Immediate)
+           4h    - xorimm   (Exclusive OR Immediate)
+           5h    - addimm   (Add Immediate)
+           6h    - subimm   (Subtract Immediate)
+           7h    - compimm  (Compare Immediate)
+           8h-Fh - invalid
+  19-16  DES2 register (r0-r15)
+  15- 0  16-bit immediate
+    </pre></td></tr></tbody></table><br>
+</html>
